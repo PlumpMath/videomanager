@@ -101,7 +101,7 @@ namespace VideoManager
                 "--vout-filter=deinterlace", "--deinterlace-mode=blend"*/
             };
 
-            instance = new VlcInstance(args);
+            instance = new VlcInstance();
             player = null;
         }
     }
