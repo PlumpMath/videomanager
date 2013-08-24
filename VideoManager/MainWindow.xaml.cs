@@ -41,8 +41,9 @@ namespace VideoManager
                 Properties.Settings.Default.DatabaseFilename + "\"";
 
             //Database.FillFromDirectory(@"C:\Users\Franz\Documents\codeprojects\VideoManager\VideoManager\local\test", false);
-
             
+            instance = new VlcInstance();
+            player = null;            
         }
 
         private void mainWindow_Closed(object sender, EventArgs e)
@@ -61,21 +62,27 @@ namespace VideoManager
             if (ofd.ShowDialog() != true)
                 return;
 
-            using (VlcMedia media = new VlcMedia(instance, ofd.FileName))
+            using (VlcMedia media = VlcMedia.CreateFromFilepath(instance, ofd.FileName))
             {
-                if (player != null) player.Dispose();
+                if (player != null) 
+                    player.Dispose();
                 player = new VlcMediaPlayer(media);
             }
 
             System.Windows.Forms.Panel panel = new System.Windows.Forms.Panel();
-            panel.Height = 300;
-            panel.Width = 300;
+            panel.Height = 200;
+            panel.Width = 200;
+            panel.Margin = new System.Windows.Forms.Padding(0);
 
             System.Windows.Forms.Integration.WindowsFormsHost wfh = new System.Windows.Forms.Integration.WindowsFormsHost();
-            wfh.Width = 300;
-            wfh.Height = 300;
+            wfh.Width = 200;
+            wfh.Height = 200;
             wfh.Child = panel;
-            player.Drawable = wfh.Handle;
+            wfh.Margin = new Thickness(0.0);
+
+            this.mainGrid.Children.Add(wfh);
+
+            player.Drawable = panel.Handle;
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -95,14 +102,6 @@ namespace VideoManager
 
         private void button5_Click(object sender, RoutedEventArgs e)
         {
-            string[] args = new string[] {
-                /*"-I", "dummy", "--ignore-config",
-                @"--plugin-path=C:\Users\Franz\Documents\codeprojects\VideoManager\VideoManager\libs\plugins",
-                "--vout-filter=deinterlace", "--deinterlace-mode=blend"*/
-            };
-
-            instance = new VlcInstance();
-            player = null;
         }
     }
 }

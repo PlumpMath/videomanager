@@ -2,11 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="343" Width="819" Name="mainWindow" Loaded="mainWindow_Loaded" Closed="mainWindow_Closed">
-    <Grid>
+    <Grid Name="mainGrid">
         <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="184,269,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
         <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="311,269,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
         <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="442,269,0,0" Name="button3" VerticalAlignment="Top" Width="75" Click="button3_Click" />
         <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="577,269,0,0" Name="button4" VerticalAlignment="Top" Width="75" Click="button4_Click" />
-        <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="282,84,0,0" Name="button5" VerticalAlignment="Top" Width="75" Click="button5_Click" />
     </Grid>
 </Window>

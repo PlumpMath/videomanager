@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace VideoManager
 {
@@ -25,9 +26,29 @@ namespace VideoManager
     {
         internal IntPtr Handle;
 
-        public VlcMedia(VlcInstance instance, string url)
-        {            
-            Handle = LibVlc.libvlc_media_new(instance.Handle, url);
+        private VlcMedia()
+        {
+        }
+
+        public static VlcMedia CreateFromFilepath(VlcInstance instance, string file)
+        {
+            VlcMedia m = new VlcMedia();
+            m.Handle = LibVlc.libvlc_media_new_path(instance.Handle, file);
+            return m;
+        }
+
+        public static VlcMedia CreateFromUrl(VlcInstance instance, string url)
+        {
+            VlcMedia m = new VlcMedia();
+            m.Handle = LibVlc.libvlc_media_new_location(instance.Handle, url);
+            return m;
+        }
+
+        public static VlcMedia CreateFromFileDescriptor(VlcInstance instance, int fd)
+        {
+            VlcMedia m = new VlcMedia();
+            m.Handle = LibVlc.libvlc_media_new_fd(instance.Handle, fd);
+            return m;
         }
 
         public void Dispose()
@@ -60,7 +81,7 @@ namespace VideoManager
             }
             set
             {
-                LibVlc.libvlc_media_player_set_drawable(Handle, value);
+                LibVlc.libvlc_media_player_set_hwnd(Handle, value);
                 drawable = value;
             }
         }
