@@ -21,6 +21,7 @@ namespace VideoManager
     {
         VlcInstance instance;
         VlcMediaPlayer player;
+        SettingsWindow settingsWindow;
 
         public MainWindow()
         {
@@ -29,6 +30,7 @@ namespace VideoManager
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // AppData folder
             Properties.Settings.Default.AppDataFolder = 
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + 
                 System.IO.Path.DirectorySeparatorChar + Properties.Settings.Default.GeneralProductName;
@@ -42,15 +44,49 @@ namespace VideoManager
 
             //Database.FillFromDirectory(@"C:\Users\Franz\Documents\codeprojects\VideoManager\VideoManager\local\test", false);
             
+
+            // init windows
+            settingsWindow = new SettingsWindow();
+
+
+            // init libraries
+            if (System.IO.Directory.Exists(Properties.Settings.Default.LibraryPath))    // TODO check for plugins dir and libvlc DLLs
+            {
+                Utils.SetDllDirectory(Properties.Settings.Default.LibraryPath);
+            }
+            else
+                settingsWindow.Show();
+
+            string pluginPath = Environment.GetEnvironmentVariable("VLC_PLUGIN_PATH");
+            if (pluginPath == null)
+            {
+                MessageBox.Show("You have to set the environment variable VLC_PLUGIN_PATH to " + 
+                    Properties.Settings.Default.LibraryPath + " and restart " + 
+                    Properties.Settings.Default.GeneralProductName + "!");
+                Application.Current.Shutdown();
+                return;
+            }
+
+
+            // restore old window state
+            if (Properties.Settings.Default.WindowWidth > 0 && Properties.Settings.Default.WindowHeight > 0)
+            {
+                this.Width = Properties.Settings.Default.WindowWidth;
+                this.Height = Properties.Settings.Default.WindowHeight;
+                if (Properties.Settings.Default.WasMaximized)
+                    this.WindowState = System.Windows.WindowState.Maximized;
+                this.Left = Properties.Settings.Default.WindowLeft;
+                this.Top = Properties.Settings.Default.WindowTop;
+            }
+
+
+            // init VLC
             instance = new VlcInstance();
-            player = null;            
+            player = null;
         }
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {
-            if (player != null) 
-                player.Dispose();
-            instance.Dispose();
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -69,20 +105,7 @@ namespace VideoManager
                 player = new VlcMediaPlayer(media);
             }
 
-            System.Windows.Forms.Panel panel = new System.Windows.Forms.Panel();
-            panel.Height = 200;
-            panel.Width = 200;
-            panel.Margin = new System.Windows.Forms.Padding(0);
-
-            System.Windows.Forms.Integration.WindowsFormsHost wfh = new System.Windows.Forms.Integration.WindowsFormsHost();
-            wfh.Width = 200;
-            wfh.Height = 200;
-            wfh.Child = panel;
-            wfh.Margin = new Thickness(0.0);
-
-            this.mainGrid.Children.Add(wfh);
-
-            player.Drawable = panel.Handle;
+            player.Drawable = wfh.Child.Handle;
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -101,7 +124,26 @@ namespace VideoManager
         }
 
         private void button5_Click(object sender, RoutedEventArgs e)
-        {
+        {            
+            settingsWindow.Show();
         }
+
+        private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // save window state
+            Properties.Settings.Default.WindowWidth = this.Width;
+            Properties.Settings.Default.WindowHeight = this.Height;
+            Properties.Settings.Default.WasMaximized = (this.WindowState == System.Windows.WindowState.Maximized);
+            Properties.Settings.Default.WindowLeft = this.Left;
+            Properties.Settings.Default.WindowTop = this.Top;
+            Properties.Settings.Default.Save();
+
+            // free memory
+            if (player != null)
+                player.Dispose();
+            if (instance != null)
+                instance.Dispose();
+        }
+
     }
 }

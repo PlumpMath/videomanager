@@ -12,7 +12,6 @@ namespace VideoManager
 
         public VlcInstance()
         {
-            // init VLC            
             Handle = LibVlc.libvlc_new(0, null);
         }
 

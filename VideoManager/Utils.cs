@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace VideoManager
 {
@@ -17,5 +18,9 @@ namespace VideoManager
             //files.Sort();
             return files.ToArray();
         }
+
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern void SetDllDirectory(string lpPathName);
     }
 }
