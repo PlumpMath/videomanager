@@ -54,5 +54,11 @@ namespace VideoManager
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_stop(IntPtr player);
         #endregion
+
+
+        #region Audio
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr libvlc_audio_set_volume(IntPtr player, int volume);
+        #endregion
     }
 }

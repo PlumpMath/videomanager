@@ -18,6 +18,7 @@
                 <Button Content="Button" Height="23" Name="button3" Width="75" Click="button3_Click" />
                 <Button Content="Button" Height="23" Name="button4" Width="75" Click="button4_Click" />
                 <Button Content="Button" Height="23" Name="button5" Width="75" Click="button5_Click" />
+                <Slider Height="23" Name="sliVolume" Width="100" Value="5" ValueChanged="sliVolume_ValueChanged" />
             </StackPanel>
             <WindowsFormsHost Name="wfh" DockPanel.Dock="Top" MinWidth="320" MinHeight="240" VerticalAlignment="Stretch" Background="Black">
                 <wf:Panel Name="panelVideo" />

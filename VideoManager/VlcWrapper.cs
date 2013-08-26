@@ -21,6 +21,8 @@ namespace VideoManager
         }
     }
 
+
+
     class VlcMedia : IDisposable
     {
         internal IntPtr Handle;
@@ -55,6 +57,8 @@ namespace VideoManager
             LibVlc.libvlc_media_release(Handle);
         }
     }
+
+
 
     class VlcMediaPlayer : IDisposable
     {
@@ -113,6 +117,11 @@ namespace VideoManager
 
             playing = false;
             paused = false;
+        }
+
+        public void SetVolume(int volume)
+        {
+            LibVlc.libvlc_audio_set_volume(Handle, volume);
         }
     }
 }

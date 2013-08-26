@@ -83,6 +83,10 @@ namespace VideoManager
             // init VLC
             instance = new VlcInstance();
             player = null;
+
+
+            // init UI
+            sliVolume.Value = (Properties.Settings.Default.Volume) / 10.0;
         }
 
         private void mainWindow_Closed(object sender, EventArgs e)
@@ -106,6 +110,8 @@ namespace VideoManager
             }
 
             player.Drawable = wfh.Child.Handle;
+
+            SetVolume(sliVolume.Value);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -143,6 +149,19 @@ namespace VideoManager
                 player.Dispose();
             if (instance != null)
                 instance.Dispose();
+        }
+
+        private void sliVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (player != null)
+                SetVolume(sliVolume.Value);
+        }
+
+
+        public void SetVolume(double vol)
+        {
+            int volume = (int)vol * 10;
+            player.SetVolume(volume);
         }
 
     }
