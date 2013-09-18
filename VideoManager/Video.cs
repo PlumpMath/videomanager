@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.SQLite;
+using System.ComponentModel;
 
 namespace VideoManager
 {
-    public class Video
+    public class Video : INotifyPropertyChanged
     {
-        public static HashSet<Video> Videos = new HashSet<Video>();
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Properties
         public int? ID { get; set; }
         public string Name { get; set; }
         public Account Account { get; set; }
         public string Path { get; set; }
+        public int Length { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime LastPlayed { get; set; }
+        public int CountPlayed { get; set; }
+
         public List<Tag> Tags { get; set; }
         #endregion
 
@@ -134,23 +140,32 @@ namespace VideoManager
             return v;
         }
         #endregion
-
-
-        public static Video GetById(int id)
-        {
-            return Videos.ToList().Find(v => v.ID == id);
-        }
-
-
+        
         #region Factory Methods
         public static Video CreateFromFilepath(string filepath)
         {
             string filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
-            List<string> listParts = new List<string>(filename.Split(new Char[] { '-' }));
+            List<string> listParts = new List<string>(filename.Split(new string[] {" - "}, StringSplitOptions.RemoveEmptyEntries));
             string title = listParts.Last();
             Console.WriteLine(filepath + " => " + title);
             string accname = listParts.First();
             return new Video(title, new Account(accname), filepath);
+        }
+
+        public static Video GetById(int id)
+        {
+            return Database.GetVideoById(id);
+        }
+        #endregion
+
+        #region OnPropertyChanged Method
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
         }
         #endregion
     }

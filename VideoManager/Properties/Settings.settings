@@ -14,9 +14,6 @@
     <Setting Name="DatabaseFilename" Type="System.String" Scope="User">
       <Value Profile="(Default)">database.sqlite</Value>
     </Setting>
-    <Setting Name="AllowedFiletypes" Type="System.String" Scope="User">
-      <Value Profile="(Default)">flv,avi,mp4,wmv</Value>
-    </Setting>
     <Setting Name="DefaultPageId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
@@ -40,6 +37,9 @@
     </Setting>
     <Setting Name="Volume" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="AllowedFiletypes" Type="System.String" Scope="User">
+      <Value Profile="(Default)">flv,avi,mp4,wmv,mpg,mpeg</Value>
     </Setting>
   </Settings>
 </SettingsFile>

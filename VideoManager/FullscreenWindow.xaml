@@ -1,0 +1,11 @@
+﻿<Window x:Class="VideoManager.FullscreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        Title="FullscreenWindow" Height="300" Width="354" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="None" Left="0" Top="0" Background="Black" Topmost="True" KeyDown="Window_KeyDown" WindowState="Maximized" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <WindowsFormsHost Name="wfh" VerticalAlignment="Stretch" Background="Black">
+            <wf:Panel Name="panelVideoFull" />
+        </WindowsFormsHost>
+    </Grid>
+</Window>

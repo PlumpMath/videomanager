@@ -73,18 +73,6 @@ namespace VideoManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("flv,avi,mp4,wmv")]
-        public string AllowedFiletypes {
-            get {
-                return ((string)(this["AllowedFiletypes"]));
-            }
-            set {
-                this["AllowedFiletypes"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int DefaultPageId {
             get {
@@ -176,6 +164,18 @@ namespace VideoManager.Properties {
             }
             set {
                 this["Volume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("flv,avi,mp4,wmv,mpg,mpeg")]
+        public string AllowedFiletypes {
+            get {
+                return ((string)(this["AllowedFiletypes"]));
+            }
+            set {
+                this["AllowedFiletypes"] = value;
             }
         }
     }

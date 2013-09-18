@@ -62,20 +62,17 @@ namespace VideoManager
 
     class VlcMediaPlayer : IDisposable
     {
+        #region Fields and Properties
         internal IntPtr Handle;
         private IntPtr drawable;
-        private bool playing, paused;
+        private bool playing, paused, isKeyInputConsumed, isMouseInputConsumed;
+        
+        public bool IsPlaying { get { return playing && !paused; } }
 
-        public VlcMediaPlayer(VlcMedia media)
-        {            
-            Handle = LibVlc.libvlc_media_player_new_from_media(media.Handle);
-        }
+        public bool IsPaused { get { return playing && paused; } }
 
-        public void Dispose()
-        {
-            LibVlc.libvlc_media_player_release(Handle);
-        }
-
+        public bool IsStopped { get { return !playing; } }
+        
         public IntPtr Drawable
         {
             get
@@ -89,12 +86,50 @@ namespace VideoManager
             }
         }
 
-        public bool IsPlaying { get { return playing && !paused; } }
+        public bool IsFullscreen { get; set; }
 
-        public bool IsPaused { get { return playing && paused; } }
+        public bool IsKeyInputConsumed
+        {
+            get
+            {
+                return isKeyInputConsumed;
+            }
+            set
+            {
+                LibVlc.libvlc_video_set_key_input(Handle, value);
+                isKeyInputConsumed = value;
+            }
+        }
 
-        public bool IsStopped { get { return !playing; } }
+        public bool IsMouseInputConsumed
+        {
+            get
+            {
+                return isMouseInputConsumed;
+            }
+            set
+            {
+                LibVlc.libvlc_video_set_mouse_input(Handle, value);
+                isMouseInputConsumed = value;
+            }
+        }
+        #endregion
 
+        #region Constructors and Destructors
+        public VlcMediaPlayer(VlcMedia media)
+        {            
+            Handle = LibVlc.libvlc_media_player_new_from_media(media.Handle);
+            IsKeyInputConsumed = false;
+            IsMouseInputConsumed = false;
+        }
+
+        public void Dispose()
+        {
+            LibVlc.libvlc_media_player_release(Handle);
+        }
+        #endregion
+
+        #region Playback Control
         public void Play()
         {            
             LibVlc.libvlc_media_player_play(Handle);
@@ -118,10 +153,13 @@ namespace VideoManager
             playing = false;
             paused = false;
         }
+        #endregion
 
+        #region Sound Control
         public void SetVolume(int volume)
         {
             LibVlc.libvlc_audio_set_volume(Handle, volume);
         }
+        #endregion
     }
 }

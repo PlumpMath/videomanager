@@ -61,15 +61,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FullscreenWindow.xaml.cs">
+      <DependentUpon>FullscreenWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MessageBox.cs" />
+    <Compile Include="Playlist.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tag.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Video.cs" />
+    <Compile Include="VideoMgr.cs" />
     <Compile Include="VlcBindings.cs" />
     <Compile Include="VlcWrapper.cs" />
+    <Page Include="FullscreenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

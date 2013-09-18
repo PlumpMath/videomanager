@@ -56,6 +56,14 @@ namespace VideoManager
         #endregion
 
 
+        #region Video
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void libvlc_video_set_key_input(IntPtr player, bool vlcInterceptsKeyInput);
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void libvlc_video_set_mouse_input(IntPtr player, bool vlcInterceptsKeyInput);
+        #endregion
+
+
         #region Audio
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr libvlc_audio_set_volume(IntPtr player, int volume);
