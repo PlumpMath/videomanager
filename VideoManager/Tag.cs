@@ -35,7 +35,7 @@ namespace VideoManager
             string conStr = Properties.Settings.Default.ConnectionString;
             using (SQLiteConnection con = new SQLiteConnection(conStr))
             {
-                if (this.ID == null)
+                if (this.ID == 0)
                 {
                     // INSERT new account
                     string cmdStr = "INSERT INTO tag (name) VALUES (@Name);";

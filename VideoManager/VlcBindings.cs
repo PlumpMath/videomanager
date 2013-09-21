@@ -53,12 +53,25 @@ namespace VideoManager
 
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_stop(IntPtr player);
+
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr libvlc_media_player_get_time(IntPtr player);        // int64
+
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr libvlc_media_player_get_length(IntPtr player);        // int64
+
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern float libvlc_media_player_get_position(IntPtr player);
+
+        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void libvlc_media_player_set_position(IntPtr player, float pos);
         #endregion
 
 
         #region Video
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_video_set_key_input(IntPtr player, bool vlcInterceptsKeyInput);
+
         [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_video_set_mouse_input(IntPtr player, bool vlcInterceptsKeyInput);
         #endregion

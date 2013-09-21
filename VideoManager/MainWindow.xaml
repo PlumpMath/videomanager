@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-        Title="MainWindow" Height="333" Width="819" Name="mainWindow" Loaded="mainWindow_Loaded" Closed="mainWindow_Closed" Closing="mainWindow_Closing">
+        Title="MainWindow" Height="350" Width="963" Name="mainWindow" Loaded="mainWindow_Loaded" Closed="mainWindow_Closed" Closing="mainWindow_Closing">
     <Grid Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="166" />
@@ -14,15 +14,18 @@
                 
             </DataGrid>
         </ScrollViewer>
-        <GridSplitter Name="gridSplitter" Grid.Column="1" Width="3" HorizontalAlignment="Stretch" />
-        <DockPanel Name="dockPanelVideo" Margin="1,0,0,0" Grid.Column="2">
-            <StackPanel DockPanel.Dock="Bottom" Height="40" Name="stackPanel2" Orientation="Horizontal">
-                <Button Content="Browse..." Height="23" Name="button1" Width="75" Click="button1_Click" />
-                <Button Content="Play" Height="23" Name="button2" Width="75" Click="button2_Click" />
-                <Button Content="Pause" Height="23" Name="button3" Width="75" Click="button3_Click" />
-                <Button Content="Stop" Height="23" Name="button4" Width="75" Click="button4_Click" />
-                <Button Content="Settings" Height="23" Name="button5" Width="75" Click="button5_Click" />
-                <Slider Height="23" Name="sliVolume" Width="100" Value="5" ValueChanged="sliVolume_ValueChanged" Delay="0" />
+        <GridSplitter Name="gridSplitter" Width="5" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" />
+        <DockPanel Name="dockPanelVideo" Grid.Column="2" HorizontalAlignment="Stretch">
+            <StackPanel DockPanel.Dock="Bottom" Height="60" Name="stackPanel3" Orientation="Vertical">
+                <Slider Name="sliTime" Height="20" Delay="0" Maximum="1" />
+                <StackPanel Height="40" Name="stackPanel2" Orientation="Horizontal">
+                    <Button Content="Browse..." Height="23" Name="button1" Width="75" Click="button1_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                    <Button Content="Play" Height="23" Name="button2" Width="75" Click="button2_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                    <Button Content="Pause" Height="23" Name="button3" Width="75" Click="button3_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                    <Button Content="Stop" Height="23" Name="button4" Width="75" Click="button4_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                    <Button Content="Settings" Height="23" Name="button5" Width="75" Click="button5_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                    <Slider Height="23" Name="sliVolume" Width="100" Value="5" ValueChanged="sliVolume_ValueChanged" Delay="0" VerticalAlignment="Bottom" Margin="5,5,0,7" />
+                </StackPanel>
             </StackPanel>
             <WindowsFormsHost Name="wfh" DockPanel.Dock="Top" MinWidth="320" MinHeight="240" VerticalAlignment="Stretch" Background="Black">
                 <wf:Panel Name="panelVideo" />

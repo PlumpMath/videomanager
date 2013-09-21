@@ -62,16 +62,15 @@ namespace VideoManager
 
     class VlcMediaPlayer : IDisposable
     {
-        #region Fields and Properties
+        #region Fields
         internal IntPtr Handle;
         private IntPtr drawable;
-        private bool playing, paused, isKeyInputConsumed, isMouseInputConsumed;
+        private bool isKeyInputConsumed, isMouseInputConsumed;
+        public enum PlayingStatus { PLAYING, PAUSED, STOPPED }
+        #endregion
         
-        public bool IsPlaying { get { return playing && !paused; } }
-
-        public bool IsPaused { get { return playing && paused; } }
-
-        public bool IsStopped { get { return !playing; } }
+        #region Properties
+        public PlayingStatus Status { get; set; }
         
         public IntPtr Drawable
         {
@@ -113,6 +112,48 @@ namespace VideoManager
                 isMouseInputConsumed = value;
             }
         }
+
+        public int Length
+        {
+            get
+            {
+                return (int)LibVlc.libvlc_media_player_get_length(Handle);
+            }
+        }
+
+        public int Time
+        {
+            get
+            {
+                return (int)LibVlc.libvlc_media_player_get_time(Handle);
+            }
+        }
+
+        public float Position
+        {
+            get
+            {
+                return LibVlc.libvlc_media_player_get_position(Handle);
+            }
+            set
+            {
+                LibVlc.libvlc_media_player_set_position(Handle, value);
+            }
+        }
+        #endregion
+
+        #region Events
+        public class PlayingStatusEventArgs : EventArgs
+        {
+            public PlayingStatus Status { get; set; }
+
+            public PlayingStatusEventArgs(PlayingStatus status)
+            {
+                Status = status;
+            }
+        }
+        public delegate void PlayingStatusChangedHandler(object sender, PlayingStatusEventArgs e);
+        public event PlayingStatusChangedHandler PlayingStatusChanged;
         #endregion
 
         #region Constructors and Destructors
@@ -134,24 +175,33 @@ namespace VideoManager
         {            
             LibVlc.libvlc_media_player_play(Handle);
 
-            playing = true;
-            paused = false;
+            Status = PlayingStatus.PLAYING;
+
+            if (PlayingStatusChanged != null)
+                PlayingStatusChanged(this, new PlayingStatusEventArgs(Status));
         }
 
         public void Pause()
-        {            
+        {
+            if (Status != PlayingStatus.PLAYING)
+                return;
+
             LibVlc.libvlc_media_player_pause(Handle);
 
-            if (playing)
-                paused ^= true;
+            Status = PlayingStatus.PAUSED;
+
+            if (PlayingStatusChanged != null)
+                PlayingStatusChanged(this, new PlayingStatusEventArgs(Status));
         }
 
         public void Stop()
-        {            
+        {
             LibVlc.libvlc_media_player_stop(Handle);
 
-            playing = false;
-            paused = false;
+            Status = PlayingStatus.STOPPED;
+
+            if (PlayingStatusChanged != null)
+                PlayingStatusChanged(this, new PlayingStatusEventArgs(Status));
         }
         #endregion
 

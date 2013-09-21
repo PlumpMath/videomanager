@@ -178,5 +178,17 @@ namespace VideoManager.Properties {
                 this["AllowedFiletypes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("167")]
+        public double PlaylistWidth {
+            get {
+                return ((double)(this["PlaylistWidth"]));
+            }
+            set {
+                this["PlaylistWidth"] = value;
+            }
+        }
     }
 }

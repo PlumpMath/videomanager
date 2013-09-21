@@ -24,7 +24,6 @@ namespace VideoManager
         VlcMediaPlayer player;
         SettingsWindow settingsWindow;
         FullscreenWindow fw;
-        double playlistWidth;
         System.Windows.Forms.Control videoControl;
 
         public MainWindow()
@@ -52,7 +51,6 @@ namespace VideoManager
                 wfh.Child.Parent = fw.wfh.Child;        // this.panelVideo.parent = fw.panelVideo
                 wfh.Child.Dock = System.Windows.Forms.DockStyle.Fill;
                 fw.Show();
-                //player.SetFullscreen(true);
             }
         }
 
@@ -131,7 +129,10 @@ namespace VideoManager
                     this.WindowState = System.Windows.WindowState.Maximized;
                 this.Left = Properties.Settings.Default.WindowLeft;
                 this.Top = Properties.Settings.Default.WindowTop;
-                playlistWidth = scrollViewerPlaylist.Width;
+				double plWidth = Properties.Settings.Default.PlaylistWidth;
+				this.mainGrid.ColumnDefinitions[2].Width = 
+					new GridLength(this.mainGrid.ActualWidth - this.gridSplitter.ActualWidth - plWidth);
+				this.mainGrid.ColumnDefinitions[0].Width = new GridLength(plWidth);
             }
 
 
@@ -147,6 +148,25 @@ namespace VideoManager
             // init UI
             sliVolume.Value = (Properties.Settings.Default.Volume) / 10.0;
         }
+
+		private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			// save window state
+			Properties.Settings.Default.WindowWidth = this.Width;
+			Properties.Settings.Default.WindowHeight = this.Height;
+			Properties.Settings.Default.WasMaximized = (this.WindowState == System.Windows.WindowState.Maximized);
+			Properties.Settings.Default.WindowLeft = this.Left;
+			Properties.Settings.Default.WindowTop = this.Top;
+			Properties.Settings.Default.PlaylistWidth = this.mainGrid.ColumnDefinitions[0].Width.Value;
+			Properties.Settings.Default.Volume = (int)sliVolume.Value * 10;
+			Properties.Settings.Default.Save();
+
+			// free memory
+			if (player != null)
+				player.Dispose();
+			if (instance != null)
+				instance.Dispose();
+		}
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {
@@ -179,6 +199,7 @@ namespace VideoManager
             }
             
             player.Drawable = wfh.Child.Handle;
+            player.PlayingStatusChanged += new VlcMediaPlayer.PlayingStatusChangedHandler(PlayingStatusChanged);
 
             SetVolume(sliVolume.Value);
         }
@@ -206,24 +227,6 @@ namespace VideoManager
             settingsWindow.Show();
         }
 
-        private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // save window state
-            Properties.Settings.Default.WindowWidth = this.Width;
-            Properties.Settings.Default.WindowHeight = this.Height;
-            Properties.Settings.Default.WasMaximized = (this.WindowState == System.Windows.WindowState.Maximized);
-            Properties.Settings.Default.WindowLeft = this.Left;
-            Properties.Settings.Default.WindowTop = this.Top;
-            Properties.Settings.Default.Volume = (int)sliVolume.Value * 10;
-            Properties.Settings.Default.Save();
-
-            // free memory
-            if (player != null)
-                player.Dispose();
-            if (instance != null)
-                instance.Dispose();
-        }
-
         private void sliVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (player != null)
@@ -238,5 +241,34 @@ namespace VideoManager
                 player.SetVolume(volume);
         }
 
+		private System.Threading.Timer timerProgressUpdate;
+
+		private void PlayingStatusChanged(object sender, VlcMediaPlayer.PlayingStatusEventArgs e)
+		{
+			switch (e.Status)
+			{
+				case VlcMediaPlayer.PlayingStatus.PLAYING:
+					timerProgressUpdate = new System.Threading.Timer(new System.Threading.TimerCallback(ProgressUpdate), player, 0, 500);
+					break;
+				case VlcMediaPlayer.PlayingStatus.PAUSED:
+					if (timerProgressUpdate != null)
+						timerProgressUpdate.Dispose();
+					break;
+				case VlcMediaPlayer.PlayingStatus.STOPPED:
+					if (timerProgressUpdate != null)
+						timerProgressUpdate.Dispose();
+					break;
+				default: 
+					break;
+			}
+		}
+
+		private void ProgressUpdate(object state)
+		{
+			if (state == null)
+				return;
+			VlcMediaPlayer player = (VlcMediaPlayer)state;
+			sliTime.Dispatcher.Invoke(new Action(() => sliTime.Value = player.Position), null);
+		}
     }
 }

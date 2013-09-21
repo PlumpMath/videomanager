@@ -41,5 +41,8 @@
     <Setting Name="AllowedFiletypes" Type="System.String" Scope="User">
       <Value Profile="(Default)">flv,avi,mp4,wmv,mpg,mpeg</Value>
     </Setting>
+    <Setting Name="PlaylistWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">167</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
