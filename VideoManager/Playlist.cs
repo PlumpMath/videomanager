@@ -39,6 +39,11 @@ namespace VideoManager
                 Videos.AddRange(videos);
         }
 
+		public void AddVideosFromDirectory(string path, bool recursive = true)
+		{
+			Videos.AddRange(VideoMgr.GetVideosFromDirectory(path, recursive));
+		}
+
         public bool RemoveVideo(Video video)
         {
             return Videos.Remove(video);

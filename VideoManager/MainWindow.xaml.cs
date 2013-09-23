@@ -20,7 +20,6 @@ namespace VideoManager
     /// </summary>
     public partial class MainWindow : Window
     {
-        VlcInstance instance;
         VlcMediaPlayer player;
         SettingsWindow settingsWindow;
         FullscreenWindow fw;
@@ -42,7 +41,8 @@ namespace VideoManager
         }
 
 
-        public void SetToFullscreen()
+		#region Fullscreen
+		public void SetToFullscreen()
         {
             if (player != null && !player.IsFullscreen) // fullscreen only when video loaded, back always
             {
@@ -62,9 +62,10 @@ namespace VideoManager
             ctrl.Parent = videoControl;     // fw.panelVideo.child.parent = this.panelVideo.parent
             player.IsFullscreen = false;
         }
+		#endregion
 
 
-        private void gridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+		private void gridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
             int delta = (int)(mainGrid.ColumnDefinitions[0].ActualWidth + e.HorizontalChange);
             if (delta > 0)
@@ -137,8 +138,13 @@ namespace VideoManager
 
 
             // init VLC
-            instance = new VlcInstance();
-            player = null;
+			player = new VlcMediaPlayer();
+
+			player.Drawable = wfh.Child.Handle;
+			player.PlayingStatusChanged += new VlcMediaPlayer.PlayingStatusChangedHandler(PlayingStatusChanged);
+			player.LengthChanged += new VlcMediaPlayer.LengthChangedHandler(LengthChanged);
+
+			player.SetVolume(sliVolume.Value);
 
 
             // init input
@@ -146,9 +152,11 @@ namespace VideoManager
 
 
             // init UI
-            sliVolume.Value = (Properties.Settings.Default.Volume) / 10.0;
+            sliVolume.Value = Properties.Settings.Default.Volume;
         }
 
+
+		#region Window Close Events
 		private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			// save window state
@@ -158,50 +166,40 @@ namespace VideoManager
 			Properties.Settings.Default.WindowLeft = this.Left;
 			Properties.Settings.Default.WindowTop = this.Top;
 			Properties.Settings.Default.PlaylistWidth = this.mainGrid.ColumnDefinitions[0].Width.Value;
-			Properties.Settings.Default.Volume = (int)sliVolume.Value * 10;
+			Properties.Settings.Default.Volume = (int)sliVolume.Value;
 			Properties.Settings.Default.Save();
 
 			// free memory
 			if (player != null)
 				player.Dispose();
-			if (instance != null)
-				instance.Dispose();
 		}
+
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {
         }
+#endregion
 
 
         private void keyDown(object sender, KeyEventArgs e)
         {
             Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
-            if (key == Key.M)// && (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.System)))
+            if (key == Key.Enter)// && (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.System)))
                 if (player != null)
                     SetToFullscreen();
         }
 
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+		#region Button Click Handlers
+		private void button1_Click(object sender, RoutedEventArgs e)
         {
-
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.FileName = "";
             ofd.Filter = VideoMgr.GetAllowedFiletypesSelector();
             if (ofd.ShowDialog() != true)
                 return;
 
-            using (VlcMedia media = VlcMedia.CreateFromFilepath(instance, ofd.FileName))
-            {
-                if (player != null) 
-                    player.Dispose();
-                player = new VlcMediaPlayer(media);
-            }
-            
-            player.Drawable = wfh.Child.Handle;
-            player.PlayingStatusChanged += new VlcMediaPlayer.PlayingStatusChangedHandler(PlayingStatusChanged);
-
-            SetVolume(sliVolume.Value);
+			player.SetMediaFile(ofd.FileName);	// TODO player event media changed -> setmediafile, volume, etc.
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -226,21 +224,19 @@ namespace VideoManager
         {            
             settingsWindow.Show();
         }
+		#endregion
 
-        private void sliVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+
+		#region Volume Slider
+		private void sliVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (player != null)
-                SetVolume(sliVolume.Value);
+                player.SetVolume(sliVolume.Value);
         }
+		#endregion
 
 
-        public void SetVolume(double vol)
-        {
-            int volume = (int)vol * 10;
-            if (player != null)
-                player.SetVolume(volume);
-        }
-
+		#region Playing Status Change
 		private System.Threading.Timer timerProgressUpdate;
 
 		private void PlayingStatusChanged(object sender, VlcMediaPlayer.PlayingStatusEventArgs e)
@@ -268,7 +264,29 @@ namespace VideoManager
 			if (state == null)
 				return;
 			VlcMediaPlayer player = (VlcMediaPlayer)state;
-			sliTime.Dispatcher.Invoke(new Action(() => sliTime.Value = player.Position), null);
+			float pos = player.Position;
+			sliTime.Dispatcher.Invoke(new Action(() => sliTime.Value = pos), null);
+			float rel = pos * player.Length;
+			int totalSecs = (int)rel / 1000;
+			int mins = totalSecs / 60;
+			int secs = totalSecs - mins * 60;
+			string strTime = mins.ToString() + ":" + secs.ToString("0#");
+			lblVideoTime.Dispatcher.Invoke(new Action(() => lblVideoTime.Content = strTime), null);
 		}
-    }
+		#endregion
+
+
+		private void LengthChanged(object sender, VlcMediaPlayer.LengthEventArgs e)
+		{
+			long totalSeconds = e.Length / 1000;
+			long hours = totalSeconds / 3600;
+			long minutes = (totalSeconds - hours * 3600) / 60;
+			long seconds = totalSeconds - hours * 3600 - minutes * 60;
+			string strLength = "/" + ((hours > 0) ? (hours.ToString() + ":") : "") +
+				minutes.ToString("0#") + ":" + seconds.ToString("0#");
+			lblVideoLength.Dispatcher.Invoke(new Action(() => lblVideoLength.Content = strLength), null);
+
+			// TODO save length to database
+		}
+	}
 }
