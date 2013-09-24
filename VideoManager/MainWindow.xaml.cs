@@ -141,8 +141,11 @@ namespace VideoManager
 			player = new VlcMediaPlayer();
 
 			player.Drawable = wfh.Child.Handle;
+
 			player.PlayingStatusChanged += new VlcMediaPlayer.PlayingStatusChangedHandler(PlayingStatusChanged);
 			player.LengthChanged += new VlcMediaPlayer.LengthChangedHandler(LengthChanged);
+			player.PositionChanged += new VlcMediaPlayer.PositionChangedHandler(PositionChanged);
+			player.TimeChanged += new VlcMediaPlayer.TimeChangedHandler(TimeChanged);
 
 			player.SetVolume(sliVolume.Value);
 
@@ -178,7 +181,7 @@ namespace VideoManager
         private void mainWindow_Closed(object sender, EventArgs e)
         {
         }
-#endregion
+		#endregion
 
 
         private void keyDown(object sender, KeyEventArgs e)
@@ -236,57 +239,42 @@ namespace VideoManager
 		#endregion
 
 
-		#region Playing Status Change
-		private System.Threading.Timer timerProgressUpdate;
+		#region Event Handlers
 
 		private void PlayingStatusChanged(object sender, VlcMediaPlayer.PlayingStatusEventArgs e)
 		{
 			switch (e.Status)
 			{
 				case VlcMediaPlayer.PlayingStatus.PLAYING:
-					timerProgressUpdate = new System.Threading.Timer(new System.Threading.TimerCallback(ProgressUpdate), player, 0, 500);
 					break;
 				case VlcMediaPlayer.PlayingStatus.PAUSED:
-					if (timerProgressUpdate != null)
-						timerProgressUpdate.Dispose();
 					break;
 				case VlcMediaPlayer.PlayingStatus.STOPPED:
-					if (timerProgressUpdate != null)
-						timerProgressUpdate.Dispose();
 					break;
 				default: 
 					break;
 			}
 		}
 
-		private void ProgressUpdate(object state)
+
+		private void LengthChanged(object sender, EventArgs e)
 		{
-			if (state == null)
-				return;
-			VlcMediaPlayer player = (VlcMediaPlayer)state;
-			float pos = player.Position;
-			sliTime.Dispatcher.Invoke(new Action(() => sliTime.Value = pos), null);
-			float rel = pos * player.Length;
-			int totalSecs = (int)rel / 1000;
-			int mins = totalSecs / 60;
-			int secs = totalSecs - mins * 60;
-			string strTime = mins.ToString() + ":" + secs.ToString("0#");
-			lblVideoTime.Dispatcher.Invoke(new Action(() => lblVideoTime.Content = strTime), null);
-		}
-		#endregion
-
-
-		private void LengthChanged(object sender, VlcMediaPlayer.LengthEventArgs e)
-		{
-			long totalSeconds = e.Length / 1000;
-			long hours = totalSeconds / 3600;
-			long minutes = (totalSeconds - hours * 3600) / 60;
-			long seconds = totalSeconds - hours * 3600 - minutes * 60;
-			string strLength = "/" + ((hours > 0) ? (hours.ToString() + ":") : "") +
-				minutes.ToString("0#") + ":" + seconds.ToString("0#");
-			lblVideoLength.Dispatcher.Invoke(new Action(() => lblVideoLength.Content = strLength), null);
-
 			// TODO save length to database
 		}
+
+
+		private void PositionChanged(object sender, EventArgs e)
+		{
+			float pos = player.Position;
+			sliTime.Dispatcher.Invoke(new Action(() => sliTime.Value = pos), null);
+		}
+
+
+		private void TimeChanged(object sender, EventArgs e)
+		{
+			string strTime = player.LengthString + " / " + player.TimeString;
+			lblVideoTimeLength.Dispatcher.Invoke(new Action(() => lblVideoTimeLength.Content = strTime), null);
+		}
+		#endregion
 	}
 }

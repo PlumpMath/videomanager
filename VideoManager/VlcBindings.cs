@@ -100,6 +100,10 @@ namespace VideoManager
 		public static extern int libvlc_event_attach(IntPtr event_manager, libvlc_event_type_t event_type,
 			EventCallbackDelegate callback, IntPtr user_data);
 
+		[DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+		public static extern void libvlc_event_detach(IntPtr event_manager, libvlc_event_type_t event_type,
+			EventCallbackDelegate callback, IntPtr user_data);
+
 		internal enum libvlc_event_type_t
 		{
 			libvlc_MediaMetaChanged = 0,

@@ -66,7 +66,6 @@ namespace VideoManager
         internal IntPtr Handle;
 		private VlcInstance instance;
         private IntPtr drawable;
-		private long videoLength;
         private bool isKeyInputConsumed, isMouseInputConsumed;
 		public enum PlayingStatus { PLAYING, PAUSED, STOPPED };
         #endregion
@@ -118,21 +117,19 @@ namespace VideoManager
             }
         }
 
-		public long Length
+		public long Length { get; private set; }
+
+		public string LengthString { get; private set; }
+
+        public long Time
         {
             get
             {
-				return videoLength;
+                return LibVlc.libvlc_media_player_get_time(Handle);
             }
         }
 
-        public int Time
-        {
-            get
-            {
-                return (int)LibVlc.libvlc_media_player_get_time(Handle);
-            }
-        }
+		public string TimeString { get; private set; }
 
         public float Position
         {
@@ -167,19 +164,18 @@ namespace VideoManager
 		#endregion
 
 		#region VLC Events
-		#region Length Changed
-		public class LengthEventArgs : EventArgs
-		{
-			public long Length { get; set; }
-
-			public LengthEventArgs(long length)
-			{
-				Length = length;
-			}
-		}
+		#region Delegates
 		private LibVlc.EventCallbackDelegate vlcLengthChangedDelegate;
-		public delegate void LengthChangedHandler(object sender, LengthEventArgs e);
+		public delegate void LengthChangedHandler(object sender, EventArgs e);
 		public event LengthChangedHandler LengthChanged;
+
+		private LibVlc.EventCallbackDelegate vlcPositionChangedDelegate;
+		public delegate void PositionChangedHandler(object sender, EventArgs e);
+		public event PositionChangedHandler PositionChanged;
+
+		private LibVlc.EventCallbackDelegate vlcTimeChangedDelegate;
+		public delegate void TimeChangedHandler(object sender, EventArgs e);
+		public event TimeChangedHandler TimeChanged;
 		#endregion
 
 		#endregion
@@ -193,11 +189,7 @@ namespace VideoManager
 			Handle = LibVlc.libvlc_media_player_new(instance.Handle);
 			IsKeyInputConsumed = false;
 			IsMouseInputConsumed = false;
-
-			EventManager = LibVlc.libvlc_media_player_event_manager(Handle);
-			vlcLengthChangedDelegate = new LibVlc.EventCallbackDelegate(VideoChanged);
-			LibVlc.libvlc_event_attach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerLengthChanged, 
-				vlcLengthChangedDelegate, IntPtr.Zero);
+			RegisterEvents();
 		}
 
         public VlcMediaPlayer(VlcMedia media)
@@ -208,7 +200,8 @@ namespace VideoManager
         }
 
         public void Dispose()
-        {
+		{
+			DeregisterEvents();
 			LibVlc.libvlc_media_player_release(Handle);
 			if (instance != null)
 				instance.Dispose();
@@ -216,7 +209,36 @@ namespace VideoManager
         #endregion
 
 
-        #region Playback Control
+		#region Event (De)Registering
+		private void RegisterEvents()
+		{
+			EventManager = LibVlc.libvlc_media_player_event_manager(Handle);
+			vlcLengthChangedDelegate = new LibVlc.EventCallbackDelegate(VideoLengthChanged);
+			LibVlc.libvlc_event_attach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerLengthChanged,
+				vlcLengthChangedDelegate, IntPtr.Zero);
+			vlcPositionChangedDelegate = new LibVlc.EventCallbackDelegate(VideoPositionChanged);
+			LibVlc.libvlc_event_attach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerPositionChanged,
+				vlcPositionChangedDelegate, IntPtr.Zero);
+			vlcTimeChangedDelegate = new LibVlc.EventCallbackDelegate(VideoTimeChanged);
+			LibVlc.libvlc_event_attach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerTimeChanged,
+				vlcTimeChangedDelegate, IntPtr.Zero);
+		}
+
+		private void DeregisterEvents()
+		{
+			/*
+			LibVlc.libvlc_event_detach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerLengthChanged,
+				vlcLengthChangedDelegate, this.Handle);
+			LibVlc.libvlc_event_detach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerPositionChanged,
+				vlcPositionChangedDelegate, this.Handle);
+			LibVlc.libvlc_event_detach(EventManager, LibVlc.libvlc_event_type_t.libvlc_MediaPlayerTimeChanged,
+				vlcTimeChangedDelegate, this.Handle);
+			*/
+		}
+		#endregion
+
+
+		#region Playback Control
 		public void SetMedia(VlcMedia media)
 		{
 			LibVlc.libvlc_media_player_set_media(Handle, media.Handle);
@@ -235,8 +257,6 @@ namespace VideoManager
         public void Play()
         {
 			LibVlc.libvlc_media_player_play(Handle);
-
-			videoLength = LibVlc.libvlc_media_player_get_length(Handle);
 
             Status = PlayingStatus.PLAYING;
 
@@ -278,14 +298,39 @@ namespace VideoManager
         #endregion
 
 
-		#region Events
-		private void VideoChanged(IntPtr userdata)
+		#region VLC Event Handlers
+		private string GetLongTimeAsString(long time)
 		{
-			// userdata holds the mediaplayer instance handle (= this.Handle)
-			// TODO take this from libvlc_event_t parameter (look at callback definition in C)
-			videoLength = LibVlc.libvlc_media_player_get_length(this.Handle);
+			long totalSeconds = time / 1000;
+			long hours = totalSeconds / 3600;
+			long minutes = (totalSeconds - hours * 3600) / 60;
+			long seconds = totalSeconds - hours * 3600 - minutes * 60;
+			return ((hours > 0) ? (hours.ToString() + ":") : "") + 
+				minutes.ToString("0#") + ":" + seconds.ToString("0#");
+		}
+
+		private void VideoLengthChanged(IntPtr userdata)
+		{
+			Length = LibVlc.libvlc_media_player_get_length(this.Handle);
+
+			LengthString = GetLongTimeAsString(Length);
+
 			if (LengthChanged != null)
-				LengthChanged(this, new LengthEventArgs(videoLength));
+				LengthChanged(this, new EventArgs());
+		}
+
+		private void VideoPositionChanged(IntPtr userdata)
+		{
+			if (PositionChanged != null)
+				PositionChanged(this, new EventArgs());
+		}
+
+		private void VideoTimeChanged(IntPtr userdata)
+		{
+			TimeString = GetLongTimeAsString(Time);
+
+			if (TimeChanged != null)
+				TimeChanged(this, new EventArgs());
 		}
 		#endregion
 	}

@@ -5,7 +5,7 @@
         Title="MainWindow" Height="350" Width="963" Name="mainWindow" Loaded="mainWindow_Loaded" Closed="mainWindow_Closed" Closing="mainWindow_Closing">
     <Grid Name="mainGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="166" />
+            <ColumnDefinition Width="2" MinWidth="166" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="300" />
         </Grid.ColumnDefinitions>
@@ -28,8 +28,7 @@
                         <Slider Height="23" Name="sliVolume" Width="100" Value="0.5" ValueChanged="sliVolume_ValueChanged" Delay="0" VerticalAlignment="Bottom" Margin="5,5,0,7" Maximum="1" LargeChange="0.1" SmallChange="0.01" />
                     </StackPanel>
                     <StackPanel Height="40" Name="stackPanel4" Orientation="Horizontal" DockPanel.Dock="Right" FlowDirection="RightToLeft">
-                        <Label Name="lblVideoLength" />
-                        <Label Name="lblVideoTime" />
+                        <Label Name="lblVideoTimeLength" />
                     </StackPanel>
                 </DockPanel>
             </StackPanel>
