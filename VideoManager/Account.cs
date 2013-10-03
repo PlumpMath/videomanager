@@ -11,7 +11,7 @@ namespace VideoManager
         public static HashSet<Account> Accounts = new HashSet<Account>();
 
         #region Properties
-        public int? ID { get; set; }
+        public Int64? ID { get; set; }
         public string Name { get; set; }
         public Page Page { get; set; }
         public Account MainAccount { get; set; }
@@ -28,7 +28,7 @@ namespace VideoManager
             Tags = new List<Tag>();
         }
 
-        public Account(int? id, string name)
+        public Account(Int64? id, string name)
         {
             ID = id;
             Name = name;
@@ -37,7 +37,7 @@ namespace VideoManager
             Tags = new List<Tag>();
         }
 
-        public Account(int? id, string name, Page page)
+        public Account(Int64? id, string name, Page page)
         {
             ID = id;
             Name = name;
@@ -46,7 +46,7 @@ namespace VideoManager
             Tags = new List<Tag>();
         }
 
-        public Account(int? id, string name, Page page, int mainAccId)
+        public Account(Int64? id, string name, Page page, int mainAccId)
         {
             ID = id;
             Name = name;
@@ -55,7 +55,7 @@ namespace VideoManager
             Tags = new List<Tag>();
         }
 
-        public Account(int? id, string name, Page page, Account main)
+        public Account(Int64? id, string name, Page page, Account main)
         {
             ID = id;
             Name = name;
@@ -91,7 +91,7 @@ namespace VideoManager
                     }
                     try
                     {
-                        cmdStr = "last_insert_rowid()";
+						cmdStr = "SELECT last_insert_rowid()";
                         cmd = new SQLiteCommand(cmdStr, con);
                         this.ID = (int)cmd.ExecuteScalar();
                     }

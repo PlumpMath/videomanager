@@ -53,7 +53,7 @@ namespace VideoManager
                     }
                     try
                     {
-                        cmdStr = "last_insert_rowid()";
+						cmdStr = "SELECT last_insert_rowid()";
                         cmd = new SQLiteCommand(cmdStr, con);
                         this.ID = (int)cmd.ExecuteScalar();
                     }

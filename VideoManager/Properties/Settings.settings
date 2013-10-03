@@ -14,7 +14,7 @@
     <Setting Name="DatabaseFilename" Type="System.String" Scope="User">
       <Value Profile="(Default)">database.sqlite</Value>
     </Setting>
-    <Setting Name="DefaultPageId" Type="System.Int32" Scope="User">
+    <Setting Name="DefaultPageId" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="LibraryPath" Type="System.String" Scope="User">
@@ -43,6 +43,9 @@
     </Setting>
     <Setting Name="PlaylistWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">167</Value>
+    </Setting>
+    <Setting Name="VideoDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

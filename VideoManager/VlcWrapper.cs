@@ -299,21 +299,12 @@ namespace VideoManager
 
 
 		#region VLC Event Handlers
-		private string GetLongTimeAsString(long time)
-		{
-			long totalSeconds = time / 1000;
-			long hours = totalSeconds / 3600;
-			long minutes = (totalSeconds - hours * 3600) / 60;
-			long seconds = totalSeconds - hours * 3600 - minutes * 60;
-			return ((hours > 0) ? (hours.ToString() + ":") : "") + 
-				minutes.ToString("0#") + ":" + seconds.ToString("0#");
-		}
 
 		private void VideoLengthChanged(IntPtr userdata)
 		{
 			Length = LibVlc.libvlc_media_player_get_length(this.Handle);
 
-			LengthString = GetLongTimeAsString(Length);
+			LengthString = Utils.GetLongTimeAsString(Length);
 
 			if (LengthChanged != null)
 				LengthChanged(this, new EventArgs());
@@ -327,7 +318,7 @@ namespace VideoManager
 
 		private void VideoTimeChanged(IntPtr userdata)
 		{
-			TimeString = GetLongTimeAsString(Time);
+			TimeString = Utils.GetLongTimeAsString(Time);
 
 			if (TimeChanged != null)
 				TimeChanged(this, new EventArgs());

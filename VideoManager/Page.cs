@@ -11,7 +11,7 @@ namespace VideoManager
         public static HashSet<Page> Pages = new HashSet<Page>();
 
         #region Properties
-        public int? ID { get; set; }
+        public Int64? ID { get; set; }
         public string Name { get; set; }
         public string URL { get; set; }
         public string Abbreviation { get; set; }
@@ -25,14 +25,14 @@ namespace VideoManager
             URL = url;
         }
 
-        public Page(int? id, string name, string url)
+        public Page(Int64? id, string name, string url)
         {
             ID = id;
             Name = name;
             URL = url;
         }
 
-        public Page(int? id, string name, string url, string abbrev)
+        public Page(Int64? id, string name, string url, string abbrev)
         {
             ID = id;
             Name = name;
@@ -43,8 +43,8 @@ namespace VideoManager
 
 
         public static Page GetDefaultPage()
-        {
-            if (Default == null)
+		{
+            if (Default == null)				
                 Default = Page.GetById(Properties.Settings.Default.DefaultPageId);
             return Default;
         }
@@ -78,9 +78,9 @@ namespace VideoManager
                     }
                     try
                     {
-                        cmdStr = "last_insert_rowid()";
+                        cmdStr = "SELECT last_insert_rowid();";
                         cmd = new SQLiteCommand(cmdStr, con);
-                        this.ID = (int)cmd.ExecuteScalar();
+                        this.ID = (Int64)cmd.ExecuteScalar();
                     }
                     catch (Exception ex)
                     {
@@ -114,9 +114,36 @@ namespace VideoManager
         }
 
 
-        public static Page LoadFromDatabase()
+		public Page LoadFromDatabase()
+		{
+			Page p = null;
+			string conStr = Properties.Settings.Default.ConnectionString;
+			using (SQLiteConnection con = new SQLiteConnection(conStr))
+			{
+				string cmdStr = "SELECT * FROM page WHERE id=@Id;";
+				SQLiteCommand cmd = new SQLiteCommand(cmdStr, con);
+				cmd.Parameters.AddWithValue("@Id", this.ID);
+				con.Open();
+				try
+				{
+					SQLiteDataReader reader = cmd.ExecuteReader();
+					while (reader.Read()) {
+						this.Name = reader["name"].ToString();
+						this.URL = reader["url"].ToString();
+						this.Abbreviation = reader["abbreviation"].ToString();
+					}
+				}
+				catch (Exception ex)
+				{
+					System.Windows.MessageBox.Show(ex.Message);
+				}
+			}
+			return p;
+		}
+
+
+        public static bool LoadPagesFromDatabase()
         {
-            Page p = null;
             string conStr = Properties.Settings.Default.ConnectionString;
             using (SQLiteConnection con = new SQLiteConnection(conStr))
             {
@@ -127,23 +154,24 @@ namespace VideoManager
                 {
                     SQLiteDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
-                        p = new Page(
+                        Pages.Add(new Page(
                             Convert.ToInt32(reader["ID"].ToString()),
                             reader["name"].ToString(),
                             reader["url"].ToString(),
-                            reader["abbreviation"].ToString());
+                            reader["abbreviation"].ToString()));
                 }
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show(ex.Message);
+					return false;
                 }
             }
-            return p;
+			return true;
         }
         #endregion
 
 
-        public static Page GetById(int id)
+		public static Page GetById(Int64 id)
         {
             return Pages.ToList().Find(p => p.ID == id);
         }

@@ -37,9 +37,24 @@ namespace VideoManager
             }
         }
 
+		private void btnBrowseVideoDir_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog fd = new System.Windows.Forms.FolderBrowserDialog();
+            fd.Description = "Select the video directory:";
+            fd.SelectedPath = AppDomain.CurrentDomain.BaseDirectory;
+            fd.ShowNewFolderButton = false;
+            System.Windows.Forms.DialogResult dr = fd.ShowDialog();
+
+            if (dr == System.Windows.Forms.DialogResult.OK)
+            {
+				txtVideoDir.Text = fd.SelectedPath;
+            }
+        }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.LibraryPath = txtLibPath.Text;
+			Properties.Settings.Default.VideoDir = txtVideoDir.Text;
             Properties.Settings.Default.Save();
 
             // init libraries
@@ -58,6 +73,7 @@ namespace VideoManager
         {
             Properties.Settings.Default.Reload();
             txtLibPath.Text = Properties.Settings.Default.LibraryPath;
+			txtVideoDir.Text = Properties.Settings.Default.VideoDir;
         }
     }
 }

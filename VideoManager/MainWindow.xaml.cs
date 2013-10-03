@@ -156,6 +156,22 @@ namespace VideoManager
 
             // init UI
             sliVolume.Value = Properties.Settings.Default.Volume;
+
+
+			// init database
+			if (!Page.LoadPagesFromDatabase() || Page.GetDefaultPage() == null)
+			{
+				Page p = new Page(null, "YouTube", "http://youtube.com/", "YT");
+				p.SaveToDatabase();
+				if (p.ID.HasValue)
+					Properties.Settings.Default.DefaultPageId = p.ID.Value;
+				else
+					System.Windows.Forms.MessageBox.Show("Default Page didn't receive an ID!");
+			}
+
+			// init playlist
+			Playlist.ActivePlaylist = new Playlist();
+			dgPlaylist.ItemsSource = Playlist.ActivePlaylist.Videos;
         }
 
 
@@ -226,7 +242,33 @@ namespace VideoManager
         private void button5_Click(object sender, RoutedEventArgs e)
         {            
             settingsWindow.Show();
-        }
+		}
+
+		private void btnAddFile_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+			ofd.Multiselect = true;
+			if (Directory.Exists(Properties.Settings.Default.VideoDir))
+				ofd.InitialDirectory = Properties.Settings.Default.VideoDir;
+			ofd.CheckFileExists = true;
+			ofd.Filter = VideoMgr.GetAllowedFiletypesSelector();
+			bool? res = ofd.ShowDialog();
+			if (res.HasValue && res.Value)
+				Playlist.ActivePlaylist.AddVideos(ofd.FileNames);
+		}
+
+		private void btnAddDir_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog fd = 
+				new Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog();
+			//System.Windows.Forms.FolderBrowserDialog fd = new System.Windows.Forms.FolderBrowserDialog();
+			fd.EnsurePathExists = true;
+			fd.IsFolderPicker = true;
+			fd.Title = "Choose a directory...";
+			fd.InitialDirectory = Properties.Settings.Default.VideoDir;			
+			if (fd.ShowDialog() == Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.OK)
+				Playlist.ActivePlaylist.AddVideosFromDirectory(fd.FileName);
+		}
 		#endregion
 
 

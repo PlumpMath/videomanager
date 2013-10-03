@@ -8,6 +8,11 @@
             <TextBox Height="20" Name="txtLibPath" Width="348" Margin="0,0,5,0" />
             <Button Content="Browse..." Height="23" Name="btnBrowseLibPath" Width="75" Click="btnBrowseLibPath_Click" />
         </StackPanel>
+        <StackPanel Height="29" HorizontalAlignment="Stretch" Margin="12,47,12,0" Name="stackPanel2" VerticalAlignment="Top" Width="505" Orientation="Horizontal">
+            <Label Content="Video Directory:" Height="28" Name="label2" />
+            <TextBox Height="20" Name="txtVideoDir" Width="328" Margin="0,0,5,0" />
+            <Button Content="Browse..." Height="23" Name="btnBrowseVideoDir" Width="75" Click="btnBrowseVideoDir_Click" />
+        </StackPanel>
         <Button Content="Save" Height="23" HorizontalAlignment="Stretch" Margin="360,0,94,12" Name="btnSave" VerticalAlignment="Bottom" Width="75" Click="btnSave_Click" />
         <Button Content="Cancel" Height="23" HorizontalAlignment="Stretch" Margin="440,0,14,12" Name="btnCancel" VerticalAlignment="Bottom" Width="75" Click="btnCancel_Click" />
     </Grid>

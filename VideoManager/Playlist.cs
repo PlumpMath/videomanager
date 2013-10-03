@@ -3,26 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace VideoManager
 {
     public class Playlist
     {
-        private List<Video> Videos { get; set; }
+		public static Playlist ActivePlaylist { get; set; }
+        public ObservableCollection<Video> Videos { get; set; }
         public int Count { get { return Videos.Count; } private set {} }
 
         #region Constructors
         public Playlist()
         {
-            Videos = new List<Video>();
+			Videos = new ObservableCollection<Video>();
         }
 
         public Playlist(IEnumerable<Video> videos)
         {
             if (videos != null)
-                Videos = new List<Video>(videos);
+				Videos = new ObservableCollection<Video>(videos);
             else
-                Videos = new List<Video>();
+				Videos = new ObservableCollection<Video>();
         }
         #endregion
 
@@ -36,12 +38,21 @@ namespace VideoManager
         public void AddVideos(IEnumerable<Video> videos)
         {
             if (videos != null)
-                Videos.AddRange(videos);
+				foreach (Video v in videos)
+					Videos.Add(v);
         }
+
+		public void AddVideos(IEnumerable<string> paths)
+		{
+			List<Video> listVideos = new List<Video>();
+			foreach (string path in paths)
+				listVideos.Add(Video.CreateFromFilepath(path));
+		}
 
 		public void AddVideosFromDirectory(string path, bool recursive = true)
 		{
-			Videos.AddRange(VideoMgr.GetVideosFromDirectory(path, recursive));
+			foreach (Video v in VideoMgr.GetVideosFromDirectory(path, recursive))
+				Videos.Add(v);
 		}
 
         public bool RemoveVideo(Video video)
@@ -60,15 +71,17 @@ namespace VideoManager
             Videos.RemoveAt(index);
         }
 
-        public void RemoveIndexRange(int start, int count)
+        public void RemoveIndexRange(int start, int end)
         {
-            Videos.RemoveRange(start, count);
+			for (; end > start; end--)
+				Videos.RemoveAt(end);
         }
-
+		/*
         public void RemoveMatches(Predicate<Video> match)
         {
-            Videos.RemoveAll(match);
-        }
+			foreach (Video v in this.Videos
+            Videos.Where(match);
+        }*/
 
         public void Clear()
         {

@@ -74,9 +74,9 @@ namespace VideoManager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int DefaultPageId {
+        public long DefaultPageId {
             get {
-                return ((int)(this["DefaultPageId"]));
+                return ((long)(this["DefaultPageId"]));
             }
             set {
                 this["DefaultPageId"] = value;
@@ -188,6 +188,18 @@ namespace VideoManager.Properties {
             }
             set {
                 this["PlaylistWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VideoDir {
+            get {
+                return ((string)(this["VideoDir"]));
+            }
+            set {
+                this["VideoDir"] = value;
             }
         }
     }

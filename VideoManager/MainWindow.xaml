@@ -9,15 +9,36 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="300" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer HorizontalAlignment="Stretch" Name="scrollViewerPlaylist" VerticalAlignment="Stretch" Grid.Column="0">
-            <DataGrid Name="dgPlaylist" AutoGenerateColumns="False" ItemsSource="{Binding}" CanUserReorderColumns="False">
-                
-            </DataGrid>
-        </ScrollViewer>
+        <DockPanel Grid.Column="0" Name="dockPanelPlaylist" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,2">
+                <Button Content="+File" Name="btnAddFile" Click="btnAddFile_Click" />
+                <Button Content="+Dir" Name="btnAddDir" Click="btnAddDir_Click" />
+            </StackPanel>
+            <ScrollViewer DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Name="scrollViewerPlaylist" VerticalAlignment="Stretch">
+                <DataGrid Name="dgPlaylist" AutoGenerateColumns="False" ItemsSource="{Binding}" CanUserReorderColumns="False">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                        
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Account" Width="70" Binding="{Binding Path=AccountString, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True">
+
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Video" Width="160" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True">
+
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Length" Width="60" Binding="{Binding Path=LengthString, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True">
+
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </ScrollViewer>
+        </DockPanel>
         <GridSplitter Name="gridSplitter" Width="5" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" />
         <DockPanel Name="dockPanelVideo" Grid.Column="2" HorizontalAlignment="Stretch">
             <StackPanel DockPanel.Dock="Bottom" Height="60" Name="stackPanel3" Orientation="Vertical">
-                <Slider Name="sliTime" Height="20" Delay="0" Maximum="1" />
+                <Slider Name="sliTime" Height="20" Delay="0" Maximum="1" HorizontalAlignment="Stretch" />
                 <DockPanel Name="dockPanelControls" Height="40">
                     <StackPanel Height="40" Name="stackPanel2" Orientation="Horizontal" DockPanel.Dock="Left">
                         <Button Content="Browse..." Height="23" Name="button1" Width="75" Click="button1_Click" VerticalAlignment="Bottom" Margin="5,5,0,7" />
@@ -32,7 +53,7 @@
                     </StackPanel>
                 </DockPanel>
             </StackPanel>
-            <WindowsFormsHost Name="wfh" DockPanel.Dock="Top" MinWidth="320" MinHeight="240" VerticalAlignment="Stretch" Background="Black">
+            <WindowsFormsHost Name="wfh" DockPanel.Dock="Top" MinWidth="320" MinHeight="240" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Background="Black">
                 <wf:Panel Name="panelVideo" />
             </WindowsFormsHost>
         </DockPanel>
